@@ -1,0 +1,36 @@
+{
+    "black-formatter.args": ["--line-length", "79"],
+    "flake8.args": [
+        "--exclude=.git,__pycache__,*/migrations/*.py,venv,*/settings/*.py,__init__.py,apps.py"],
+
+    "editor.formatOnSave": true,  // Format code on save
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "explicit"
+    },
+
+    "editor.tabSize": 4,  // Set the tab size to 4 spaces
+    "editor.wordWrap": "on",  // Enable word wrap
+
+    "[python]": {
+        "editor.rulers": [79],  // Show a ruler at 79 characters to adhere to PEP 8 line length
+        "editor.formatOnPaste": true,  // Format code on paste
+        "editor.defaultFormatter": null,
+        "editor.formatOnSave": true,
+    },
+    
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/*.pyo": true,
+        "**/*.pyd": true,
+    },
+
+    "files.associations": {
+        "**/templates/**/*.html": "django-html",
+        "**/templates/**/*": "django-txt",
+        "**/requirements{/**,*}.{txt,in}": "pip-requirements",
+    },
+
+    "python.analysis.extraPaths": ["./Users/yemi/year5/final_year_project/project/health_be/health_api/venv/bin/python"],  // Set the path to your Django project
+    "python.autoComplete.extraPaths": ["./Users/yemi/year5/final_year_project/project/health_be/health_api/venv/bin/python"],  // Set the path to your Django project
+}

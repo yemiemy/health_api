@@ -5,12 +5,7 @@ class SPECIALIZATION_CHOICES(TextChoices):
     GENERAL_PHYSICIAN = "General Physician"
     DERMATOLOGIST = "Dermatologist"
     CARDIOLOGIST = "Cardiologist"
-
-
-class STATUS_CHOICES(TextChoices):
-    AVAILABLE = "Available"
-    BUSY = "Busy"
-    ON_LEAVE = "On Leave"
+    OPHTHAMOLOGIST = "Ophthalmologist"
 
 
 class GENDER_CHOICES(TextChoices):

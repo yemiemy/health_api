@@ -68,8 +68,10 @@ urlpatterns = [
         views.PatientRetrieveUpdateView.as_view(),
         name="patient_info",
     ),
+    path("staff/patient/", views.PatientGetView.as_view(), name="get_patient"),
     path(
-        "patients/", views.PatientListView.as_view(), name="get_all_patients"
+        "staff/patient/medical-history/", views.MedicalHistoryAPIView.as_view()
     ),
     path("staff/", views.MedicalProfessionalView.as_view(), name="staff_info"),
+    path("doctors/", views.MedicalProfessionalListAPIView.as_view()),
 ]

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from users.models import User, Patient, MedicalProfessional
+from appointments.models import Availability
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -55,6 +56,10 @@ class PatientAdmin(admin.ModelAdmin):
         model = Patient
 
 
+class AvailabilityInline(admin.TabularInline):
+    model = Availability
+
+
 class MedicalProfessionalAdmin(admin.ModelAdmin):
     list_display = (
         "email",
@@ -73,6 +78,9 @@ class MedicalProfessionalAdmin(admin.ModelAdmin):
         "specialization",
         "department",
     )
+    inlines = [
+        AvailabilityInline,
+    ]
 
     def email(self, obj: MedicalProfessional):
         return obj.user.email

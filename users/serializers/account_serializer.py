@@ -9,7 +9,12 @@ from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from django.core.cache import cache
 
-from users.models import User, Patient, MedicalProfessional
+from users.models import (
+    User,
+    Patient,
+    MedicalProfessional,
+    MedicalHistory,
+)
 from users.utils import check_verification_pin
 
 import logging
@@ -22,6 +27,7 @@ user_fields = [
     "first_name",
     "last_name",
     "avatar",
+    "gender",
     "date_of_birth",
     "phone_number",
     "address_1",
@@ -41,15 +47,21 @@ class UserBaseSerializer(serializers.ModelSerializer):
         write_only=True, required=True, allow_blank=False, allow_null=False
     )
     is_medical_professional = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField()
+    full_address = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = user_fields + [
+            "date_joined",
+            "full_address",
+            "full_name",
             "password",
             "confirm_password",
         ]
         read_only_fields = (
             "id",
+            "full_name",
             "is_email_verified",
             "is_phone_number_verified",
             "is_medical_professional",
@@ -61,6 +73,19 @@ class UserBaseSerializer(serializers.ModelSerializer):
             "first_name": {"required": True},
             "last_name": {"required": True},
         }
+
+    def get_full_name(self, obj: User):
+        return obj.full_name
+
+    def get_full_address(self, obj: User):
+        return ", ".join(
+            [
+                obj.address_1 or "",
+                obj.address_2 or "",
+                obj.state or "",
+                obj.country or "",
+            ]
+        )
 
     def get_is_medical_professional(self, obj: User):
         try:
@@ -364,8 +389,29 @@ class AccountDeletionSerializer(serializers.Serializer):
         return True
 
 
+class MedicalHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedicalHistory
+        fields = (
+            "id",
+            "patient",
+            "medical_conditions",
+            "allergies",
+            "medications",
+            "immunization_history",
+            "family_medical_history",
+            "created_at",
+        )
+        read_only_fields = (
+            "id",
+            "patient",
+            "created_at",
+        )
+
+
 class PatientSerializer(serializers.ModelSerializer):
     user = UserBaseSerializer(read_only=True)
+    medical_history = MedicalHistorySerializer(read_only=True, many=True)
 
     class Meta:
         model = Patient
@@ -383,11 +429,13 @@ class PatientSerializer(serializers.ModelSerializer):
             "emergency_contact",
             "preferred_pharmacy",
             "preferred_language",
+            "medical_history",
         )
         read_only_fields = (
             "id",
             "user",
             "bmi",
+            "medical_history",
         )
 
     def _calc_bmi(self, validated_data):

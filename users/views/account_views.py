@@ -19,9 +19,18 @@ from users.serializers import (
     UpdateUserAccountNameSerializer,
     PatientSerializer,
     MedicalProfessionalSerializer,
+    MedicalHistorySerializer,
 )
-from users.models import User, Patient, MedicalProfessional
+from users.models import (
+    User,
+    Patient,
+    MedicalProfessional,
+    MedicalHistory,
+)
 from users.permissions import IsAccountVerified
+from appointments.serilaizers import AppointmentSerializer
+from appointments.models import Appointment
+from appointments.choices import BOOKING_STATUS
 
 
 class AccountRegistrationView(CreateAPIView):
@@ -255,18 +264,15 @@ class PatientRetrieveUpdateView(APIView):
         return Response(serializer.data)
 
 
-class PatientListView(ListAPIView):
-    permission_classes = (
-        IsAuthenticated,
-        IsAdminUser,
-    )
-    serializer_class = PatientSerializer
-    queryset = Patient.objects.all()
-
-
 """
     Medical Section
 """
+
+
+class MedicalProfessionalListAPIView(ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = MedicalProfessionalSerializer
+    queryset = MedicalProfessional.objects.all()
 
 
 class MedicalProfessionalView(APIView):
@@ -304,3 +310,99 @@ class MedicalProfessionalView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save(user=self.request.user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class MedicalProfessionalPatientsListAPIView(ListAPIView):
+    permission_classes = (
+        IsAuthenticated,
+        IsAdminUser,
+    )
+    serializer_class = AppointmentSerializer
+
+    def get_queryset(self):
+        patients = Appointment.objects.filter(
+            medical_professional=self.request.user.medicalprofessional,
+            status__in=[
+                BOOKING_STATUS.ACCEPTED,
+                BOOKING_STATUS.COMPLETED,
+                BOOKING_STATUS.PENDING,
+                BOOKING_STATUS.CANCELLED,
+            ],
+        )
+        return patients
+
+
+class PatientGetView(APIView):
+    permission_classes = (
+        IsAuthenticated,
+        IsAdminUser,
+    )
+    serializer_class = PatientSerializer
+
+    def get(self, request, *args, **kwargs):
+        patient_id = self.request.query_params.get("patient_id")
+        patient = Patient.objects.filter(id=patient_id).first()
+        if not patient:
+            return Response(
+                {"detail": "No patient found for that id"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        serializer = PatientSerializer(patient)
+        return Response(serializer.data)
+
+
+class MedicalHistoryAPIView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        patient_id = self.request.query_params.get("patient_id")
+        patient = Patient.objects.filter(id=patient_id).first()
+        serializer = MedicalHistorySerializer(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(patient=patient)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def put(self, request):
+        medical_history_id = self.request.query_params.get(
+            "medical_history_id"
+        )
+        medical_history = MedicalHistory.objects.filter(
+            id=medical_history_id
+        ).first()
+
+        if not medical_history:
+            return Response(
+                {
+                    "detail": (
+                        f"No medical history found for id {medical_history_id}"
+                    )
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = MedicalHistorySerializer(
+            instance=medical_history, data=self.request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    def delete(self, request):
+        medical_history_id = self.request.query_params.get(
+            "medical_history_id"
+        )
+        medical_history = MedicalHistory.objects.filter(
+            id=medical_history_id
+        ).first()
+
+        if not medical_history:
+            return Response(
+                {
+                    "detail": (
+                        f"No medical history found for id {medical_history_id}"
+                    )
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        medical_history.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

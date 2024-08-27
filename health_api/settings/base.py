@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+from datetime import timedelta
 
 with open("/etc/health_api_config.json") as config_file:
     config = json.load(config_file)
@@ -27,11 +28,22 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # apps - alphasorted
+    "appointments",
+    "users",
+    # Dependencies
+    "corsheaders",
+    "phonenumber_field",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -111,22 +123,35 @@ DJANGO_SU_NAME = config.get("DJANGO_SU_NAME")
 DJANGO_SU_EMAIL = config.get("DJANGO_SU_EMAIL")
 DJANGO_SU_PASSWORD = config.get("DJANGO_SU_PASSWORD")
 
+AUTH_USER_MODEL = "users.User"
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
+    "ALGORITHM": "HS512",
+    "AUTH_HEADER_TYPES": ("Token",),
+}
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication"
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    "PAGE_SIZE": 10,
+    "PAGE_SIZE": 1000,
     "DEFAULT_PARSER_CLASSES": [
         "rest_framework.parsers.JSONParser",
         "rest_framework.parsers.MultiPartParser",
         "rest_framework.parsers.FormParser",
     ],
     "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
-    "EXCEPTION_HANDLER": "core.utils.custom_exception_handler",
+    "EXCEPTION_HANDLER": "users.utils.custom_exception_handler",
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
 }
 
@@ -167,3 +192,5 @@ CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
+
+HOSPITAL_ADDRESS = "Ishaga Rd, Idi-Araba, Lagos 102215, Lagos"

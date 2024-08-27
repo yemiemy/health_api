@@ -1,15 +1,15 @@
 # Health In Palms
 
-HealthnPalms (Health In Palms) is a transformative project developed as part of the final year requirements for a B.Sc in Engineering. This innovative solution aims to revolutionize healthcare access, particularly in underserved regions, by leveraging technology to improve patient data management, streamline appointment scheduling, and facilitate telemedicine services.
+HealthnPalms (Health In Palms) is a transformative project developed as part of the final year requirements for my B.Sc in Engineering. This innovative solution aims to revolutionize healthcare access, particularly in underserved regions, by leveraging technology to improve patient data management, streamline appointment scheduling, and facilitate telemedicine services.
 
 Key Features:
 
 - Centralized Patient Record Management: Efficiently store, retrieve, and update patient information in real-time.
-- Smart Appointment Scheduling: Optimize scheduling procedures using Mixed Integer Linear Programming (MILP) to reduce wait times and improve overall efficiency.
+- Smart Appointment Scheduling: Optimize scheduling procedures using Mixed Integer Linear Programming (MILP) to reduce wait times and improve efficiency.
 - Telemedicine Module: Enable remote consultations with healthcare providers through face-to-face video interactions.
-- AI-Powered Healthcare Assistance: Empower patients with AI-driven chatbots to provide guidance on common symptoms and healthcare queries.
+- AI-Powered Healthcare Assistance: Empower patients with AI-driven chatbots to guide common symptoms and healthcare queries.
 
-By utilizing Python (Django) and React (NextJS), HealthnPalms promises to address existing disparities in healthcare delivery and empower underserved populations. Join us in this journey to make healthcare accessible to all.
+Utilizing Python (Django) and React (NextJS), HealthnPalms promises to address existing disparities in healthcare delivery and empower underserved populations. Join us in this journey to make healthcare accessible to all.
 
 
 
